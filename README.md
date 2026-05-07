@@ -1,6 +1,6 @@
 # Books
 
-A simple FastAPI TODO sample project to play around with FastAPI and Pydantic and SQLite.
+A simple FastAPI TODO sample project to play around with FastAPI, Pydantic, SQLite and SQLAlchemy.
 
 ## Prerequisites
 
