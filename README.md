@@ -6,6 +6,7 @@ A simple FastAPI TODO sample project to play around with FastAPI, Pydantic, SQLi
 
 1. Install Python >= 3.14.2: https://www.python.org/downloads/
 2. Optional Install git: https://git-scm.com/install/
+3. Optional sqlite3: https://sqlite.org/download.html
 
 ## Setup the project
 
@@ -14,5 +15,5 @@ A simple FastAPI TODO sample project to play around with FastAPI, Pydantic, SQLi
 3. Activate the virtual environment: On Windwows: `.venv/Scripts/activate`.
 4. Install dependencies: `pip install -r requirements.txt`
 5. Run the application:
-    - To run it in development mode: `uvicorn books:app --reload` or `fastapi dev books.py`.
-    - To run it in production mode: `fastapi run books.py`.
+    - To run it in development mode: `uvicorn main:app --reload` or `fastapi dev main.py`.
+    - To run it in production mode: `fastapi run main.py`.
