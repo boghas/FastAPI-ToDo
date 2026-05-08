@@ -6,6 +6,7 @@ from starlette import status
 from db.database import get_db
 from typing import Annotated
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
 
 
 router = APIRouter()
@@ -15,6 +16,18 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+
+def authenticate_user(username: str, password: str, db: db_dependency):
+    user = db.query(User).filter(User.username == username).first()
+
+    if not user:
+        return False
+    
+    if not bcrypt_context.verify(password, user.hashed_password):
+        return False
+    
+    return True
 
 
 class CreateUserRequest(BaseModel):
@@ -43,3 +56,16 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         db.commit()
     except:
         raise HTTPException(status_code=500, detail="Database error when creating user.")
+    
+
+@router.post('/token')
+async def login_for_access_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: db_dependency
+):
+    user = authenticate_user(form_data.username, form_data.password, db)
+
+    if not user:
+        return "Failed auth"
+    
+    return "successful auth"
