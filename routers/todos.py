@@ -4,17 +4,10 @@ from starlette import status
 from pydantic import BaseModel, Field
 from typing import Annotated
 from sqlalchemy.orm import Session
-from db.database import SessionLocal
+from db.database import get_db
 
 
 router = APIRouter()
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
