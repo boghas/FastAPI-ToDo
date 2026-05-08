@@ -4,7 +4,7 @@ from starlette import status
 from pydantic import BaseModel, Field
 from typing import Annotated
 from sqlalchemy.orm import Session
-from database import SessionLocal
+from db.database import SessionLocal
 
 
 router = APIRouter()
