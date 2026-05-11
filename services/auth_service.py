@@ -1,4 +1,3 @@
-import os
 from sqlalchemy.orm import Session
 from models.user_model import User
 from core.security import verify_password
@@ -19,10 +18,15 @@ def authenticate_user(username: str, password: str, db: Session) -> User | None:
     return user
 
 
-def create_access_token(username: str, user_id: int, expires_delta: timedelta):
-    encode = {'sub': username, 'id': user_id}
-    expires = datetime.now(timezone.utc) + expires_delta
+def create_access_token(username: str, user_id: int, expires_delta: timedelta) -> str:
+    payload = {
+        "sub": username,
+        "id": user_id,
+        "exp": datetime.now(timezone.utc) + expires_delta,
+    }
 
-    encode.update({'exp': expires})
-
-    return jwt.encode(encode, settings.JWT_SECRET_KEY, settings.JWT_ALGORITHM)
+    return jwt.encode(
+        payload,
+        settings.JWT_SECRET_KEY,
+        algorithm=settings.JWT_ALGORITHM,
+    )

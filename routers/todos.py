@@ -1,25 +1,20 @@
 from models.todos_model import Todos
-from fastapi import APIRouter, HTTPException, Depends, Path
+from fastapi import APIRouter, HTTPException, Path
 from starlette import status
-from typing import Annotated
-from sqlalchemy.orm import Session
-from db.database import get_db
 from schemas.todos import TodoRequest
+from dependencies.database import DbSession
 
 
 router = APIRouter()
 
 
-db_dependency = Annotated[Session, Depends(get_db)]
-
-
 @router.get('/', status_code=status.HTTP_200_OK)
-async def read_all(db: db_dependency):
+async def read_all(db: DbSession):
     return db.query(Todos).all()
 
 
 @router.get('/todo/{todo_id}', status_code=status.HTTP_200_OK)
-async def read_todo(db: db_dependency, todo_id: int = Path(gt=0)):
+async def read_todo(db: DbSession, todo_id: int = Path(gt=0)):
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
 
     if todo_model is not None:
@@ -29,7 +24,7 @@ async def read_todo(db: db_dependency, todo_id: int = Path(gt=0)):
 
 
 @router.post('/todo', status_code=status.HTTP_201_CREATED)
-async def create_todo(db: db_dependency, todo_request: TodoRequest):
+async def create_todo(db: DbSession, todo_request: TodoRequest):
     todo_model = Todos(**todo_request.model_dump())
 
     try:
@@ -41,7 +36,7 @@ async def create_todo(db: db_dependency, todo_request: TodoRequest):
 
 
 @router.put('/todo/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def update_todo(db: db_dependency, todo_request: TodoRequest, todo_id: int = Path(gt=0)):
+async def update_todo(db: DbSession, todo_request: TodoRequest, todo_id: int = Path(gt=0)):
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
     
     if todo_model is None:
@@ -61,7 +56,7 @@ async def update_todo(db: db_dependency, todo_request: TodoRequest, todo_id: int
     
 
 @router.delete('/todo/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(db: db_dependency, todo_id: int = Path(gt=0)):
+async def delete_todo(db: DbSession, todo_id: int = Path(gt=0)):
     todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
 
     if not todo_model:
