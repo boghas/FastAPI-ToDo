@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Path
 from starlette import status
 from schemas.todos import TodoRequest
 from dependencies.database import DbSession
+from dependencies.user import user_dependency
 
 
 router = APIRouter()
@@ -24,8 +25,14 @@ async def read_todo(db: DbSession, todo_id: int = Path(gt=0)):
 
 
 @router.post('/todo', status_code=status.HTTP_201_CREATED)
-async def create_todo(db: DbSession, todo_request: TodoRequest):
-    todo_model = Todos(**todo_request.model_dump())
+async def create_todo(user: user_dependency, db: DbSession, todo_request: TodoRequest):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized to perform this action."
+        )
+    
+    todo_model = Todos(**todo_request.model_dump(), owner = user.get('user_id'))
 
     try:
         db.add(todo_model)
