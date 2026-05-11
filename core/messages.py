@@ -1,0 +1,1 @@
+USER_NOT_AUTHORIZED = "User not authorized to perform this action."

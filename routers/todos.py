@@ -4,14 +4,21 @@ from starlette import status
 from schemas.todos import TodoRequest
 from dependencies.database import DbSession
 from dependencies.user import user_dependency
+from core.messages import USER_NOT_AUTHORIZED
 
 
 router = APIRouter()
 
 
 @router.get('/', status_code=status.HTTP_200_OK)
-async def read_all(db: DbSession):
-    return db.query(Todos).all()
+async def read_all(user: user_dependency, db: DbSession):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=USER_NOT_AUTHORIZED
+        )
+
+    return db.query(Todos).filter(Todos.owner == user.get('user_id')).all()
 
 
 @router.get('/todo/{todo_id}', status_code=status.HTTP_200_OK)
@@ -29,7 +36,7 @@ async def create_todo(user: user_dependency, db: DbSession, todo_request: TodoRe
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authorized to perform this action."
+            detail=USER_NOT_AUTHORIZED
         )
     
     todo_model = Todos(**todo_request.model_dump(), owner = user.get('user_id'))
