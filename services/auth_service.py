@@ -3,24 +3,18 @@ from sqlalchemy.orm import Session
 from models.user_model import User
 from core.security import verify_password
 from jose import jwt
-from dotenv import load_dotenv
 from datetime import timedelta, datetime, timezone
-
-load_dotenv()
-
-
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+from core.config import settings
 
 
-def authenticate_user(username: str, password: str, db: Session) -> User | bool:
+def authenticate_user(username: str, password: str, db: Session) -> User | None:
     user = db.query(User).filter(User.username == username).first()
 
     if not user:
-        return False
+        return 
     
     if not verify_password(password, user.hashed_password):
-        return False
+        return
     
     return user
 
@@ -31,4 +25,4 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 
     encode.update({'exp': expires})
 
-    return jwt.encode(encode, JWT_SECRET_KEY, JWT_ALGORITHM)
+    return jwt.encode(encode, settings.JWT_SECRET_KEY, settings.JWT_ALGORITHM)

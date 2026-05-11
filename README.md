@@ -16,8 +16,10 @@ A simple FastAPI TODO sample project to play around with FastAPI, Pydantic, SQLi
 4. Install dependencies: `pip install -r requirements.txt`
 5. Inside the root of the project create a `.env` file and populate it with the following environment variables:
 ```
-JWT_SECRET_KEY=
+JWT_SECRET_KEY=<YOUR_JWT_SECRET_KEY>
 JWT_ALGORITHM=HS256
+DATABASE_URL=sqlite:///./todosapp.db
+ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 6. To generate a new JWT secret key you can put any string you want, but if you want more security you can generate a stronger one by using OpenSSL: ` .\openssl rand -hex 32`
 7. Run the application:
