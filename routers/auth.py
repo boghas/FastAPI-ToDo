@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from models.user_model import User
-from passlib.context import CryptContext
+from models.token import Token
 from starlette import status
 from db.database import get_db
 from typing import Annotated
@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from schemas.user import CreateUserRequest
 from core.security import hash_password
-from services.auth_service import authenticate_user
+from services.auth_service import authenticate_user, create_access_token
+from datetime import timedelta
 
 
 router = APIRouter()
@@ -36,7 +37,7 @@ async def create_user(db: db_dependency, create_user_request: CreateUserRequest)
         raise HTTPException(status_code=500, detail="Database error when creating user.")
     
 
-@router.post('/token')
+@router.post('/token', response_model=Token)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: db_dependency
@@ -46,4 +47,6 @@ async def login_for_access_token(
     if not user:
         return "Failed auth"
     
-    return "successful auth"
+    token = create_access_token(user.username, user.id, timedelta(minutes=20))
+    
+    return {'access_token': token, 'token_type': 'bearer'}
