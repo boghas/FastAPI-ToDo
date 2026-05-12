@@ -4,7 +4,7 @@ from starlette import status
 from schemas.todos import TodoRequest
 from dependencies.database import DbSession
 from dependencies.user import user_dependency
-from core.messages import USER_NOT_AUTHORIZED
+from core import messages
 
 
 router = APIRouter()
@@ -15,20 +15,26 @@ async def read_all(user: user_dependency, db: DbSession):
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=USER_NOT_AUTHORIZED
+            detail=messages.USER_NOT_AUTHORIZED
         )
 
     return db.query(Todos).filter(Todos.owner == user.get('user_id')).all()
 
 
 @router.get('/todo/{todo_id}', status_code=status.HTTP_200_OK)
-async def read_todo(db: DbSession, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
+async def read_todo(user: user_dependency, db: DbSession, todo_id: int = Path(gt=0)):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=messages.USER_NOT_AUTHORIZED
+        )
+    
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner == user.get('user_id')).first()
 
     if todo_model is not None:
         return todo_model
 
-    raise HTTPException(status_code=404, detail="Todo not found!")
+    raise HTTPException(status_code=404, detail=messages.DATABASE_ERROR_TODO_NOT_FOUND)
 
 
 @router.post('/todo', status_code=status.HTTP_201_CREATED)
@@ -36,7 +42,7 @@ async def create_todo(user: user_dependency, db: DbSession, todo_request: TodoRe
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=USER_NOT_AUTHORIZED
+            detail=messages.USER_NOT_AUTHORIZED
         )
     
     todo_model = Todos(**todo_request.model_dump(), owner = user.get('user_id'))
@@ -46,15 +52,21 @@ async def create_todo(user: user_dependency, db: DbSession, todo_request: TodoRe
         db.commit()
     except:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Database error while creating todo!")
+        raise HTTPException(status_code=500, detail=messages.DATABASE_ERROR_CREATE_TODO)
 
 
 @router.put('/todo/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def update_todo(db: DbSession, todo_request: TodoRequest, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
+async def update_todo(user: user_dependency, db: DbSession, todo_request: TodoRequest, todo_id: int = Path(gt=0)):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=messages.USER_NOT_AUTHORIZED
+        )
+    
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner == user.get('id')).first()
     
     if todo_model is None:
-        raise HTTPException(status_code=404, detail="Todo not found!")
+        raise HTTPException(status_code=404, detail=messages.DATABASE_ERROR_TODO_NOT_FOUND)
     
     todo_model.title = todo_request.title
     todo_model.description = todo_request.description
@@ -66,19 +78,25 @@ async def update_todo(db: DbSession, todo_request: TodoRequest, todo_id: int = P
         db.commit()
     except:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Database error while updating todo!")
+        raise HTTPException(status_code=500, detail=messages.DATABASE_ERROR_UPDATE_TODO)
     
 
 @router.delete('/todo/{todo_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(db: DbSession, todo_id: int = Path(gt=0)):
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).first()
+async def delete_todo(user: user_dependency, db: DbSession, todo_id: int = Path(gt=0)):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=messages.USER_NOT_AUTHORIZED
+        )
+    
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner == user.get('user_id')).first()
 
     if not todo_model:
-        raise HTTPException(status_code=404, detail="Todo not found!")
+        raise HTTPException(status_code=404, detail=messages.DATABASE_ERROR_TODO_NOT_FOUND)
     
     try:
         db.delete(todo_model)
         db.commit()
     except:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Database error while deleting todo!")
+        raise HTTPException(status_code=500, detail=messages.DATABASE_ERROR_DELETE_TODO)
