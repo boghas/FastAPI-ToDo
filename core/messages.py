@@ -1,5 +1,7 @@
 USER_NOT_AUTHORIZED = "User not authorized to perform this action."
+USER_NOT_AUTHENTICATED_ERROR = "User authentication failed"
 DATABASE_ERROR_UPDATE_TODO = "Database error while updating todo!"
 DATABASE_ERROR_TODO_NOT_FOUND = "Todo not found!"
 DATABASE_ERROR_DELETE_TODO = "Database error while deleting todo!"
 DATABASE_ERROR_CREATE_TODO = "Database error while creating todo!"
+DATABASE_ERROR_CHANGE_PASSWORD = "Database error while changing password!"

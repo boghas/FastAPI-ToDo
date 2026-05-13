@@ -13,6 +13,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         
         username: str = payload.get('sub')
         user_id: int = payload.get('id')
+        user_role: str = payload.get('role')
 
         if not username or not user_id:
             raise HTTPException(
@@ -20,7 +21,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
                 detail="Could not validate credentials."
             )
         
-        return {'username': username, 'user_id': user_id}
+        return {'username': username, 'user_id': user_id, 'role': user_role}
     except JWTError:
         raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

@@ -18,10 +18,11 @@ def authenticate_user(username: str, password: str, db: Session) -> User | None:
     return user
 
 
-def create_access_token(username: str, user_id: int, expires_delta: timedelta) -> str:
+def create_access_token(username: str, user_id: int, role: str, expires_delta: timedelta) -> str:
     payload = {
         "sub": username,
         "id": user_id,
+        "role": role,
         "exp": datetime.now(timezone.utc) + expires_delta,
     }
 

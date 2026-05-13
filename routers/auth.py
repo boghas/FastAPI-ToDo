@@ -50,6 +50,10 @@ async def login_for_access_token(
             detail="Invalid username or password",
         )
     
-    token = create_access_token(user.username, user.id, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
+    token = create_access_token(
+        username=user.username, 
+        user_id=user.id, 
+        role=user.role, 
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     
     return {'access_token': token, 'token_type': 'bearer'}

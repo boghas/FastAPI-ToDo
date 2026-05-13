@@ -8,3 +8,8 @@ class CreateUserRequest(BaseModel):
     last_name: str = Field(min_length=2, description="The user's last name.")
     password: str = Field(min_length=3, description="The user's password.")
     role: str
+
+
+class UserVerification(BaseModel):
+    password: str
+    new_password: str = Field(min_length=3, description="The new user password")
