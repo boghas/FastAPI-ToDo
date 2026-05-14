@@ -7,6 +7,7 @@ A simple FastAPI TODO sample project to play around with FastAPI, Pydantic, SQLi
 1. Install Python >= 3.14.2: https://www.python.org/downloads/
 2. Optional Install git: https://git-scm.com/install/
 3. Optional sqlite3: https://sqlite.org/download.html
+4. Docker: https://www.docker.com/products/docker-desktop/ or Rancher Desktop: https://rancherdesktop.io/
 
 ## Setup the project
 
