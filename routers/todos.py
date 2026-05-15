@@ -18,7 +18,7 @@ async def read_all(user: user_dependency, db: DbSession):
             detail=messages.USER_NOT_AUTHORIZED
         )
 
-    return db.query(Todos).filter(Todos.owner == user.get('user_id')).all()
+    return db.query(Todos).filter(Todos.owner_id == user.get('user_id')).all()
 
 
 @router.get('/todo/{todo_id}', status_code=status.HTTP_200_OK)
@@ -29,7 +29,7 @@ async def read_todo(user: user_dependency, db: DbSession, todo_id: int = Path(gt
             detail=messages.USER_NOT_AUTHORIZED
         )
     
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner == user.get('user_id')).first()
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('user_id')).first()
 
     if todo_model is not None:
         return todo_model
@@ -45,7 +45,7 @@ async def create_todo(user: user_dependency, db: DbSession, todo_request: TodoRe
             detail=messages.USER_NOT_AUTHORIZED
         )
     
-    todo_model = Todos(**todo_request.model_dump(), owner = user.get('user_id'))
+    todo_model = Todos(**todo_request.model_dump(), owner_id = user.get('user_id'))
 
     try:
         db.add(todo_model)
@@ -63,7 +63,7 @@ async def update_todo(user: user_dependency, db: DbSession, todo_request: TodoRe
             detail=messages.USER_NOT_AUTHORIZED
         )
     
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner == user.get('id')).first()
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('id')).first()
     
     if todo_model is None:
         raise HTTPException(status_code=404, detail=messages.DATABASE_ERROR_TODO_NOT_FOUND)
@@ -89,7 +89,7 @@ async def delete_todo(user: user_dependency, db: DbSession, todo_id: int = Path(
             detail=messages.USER_NOT_AUTHORIZED
         )
     
-    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner == user.get('user_id')).first()
+    todo_model = db.query(Todos).filter(Todos.id == todo_id).filter(Todos.owner_id == user.get('user_id')).first()
 
     if not todo_model:
         raise HTTPException(status_code=404, detail=messages.DATABASE_ERROR_TODO_NOT_FOUND)

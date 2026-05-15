@@ -19,7 +19,8 @@ A simple FastAPI TODO sample project to play around with FastAPI, Pydantic, SQLi
 ```
 JWT_SECRET_KEY=<YOUR_JWT_SECRET_KEY>
 JWT_ALGORITHM=HS256
-DATABASE_URL=sqlite:///./todosapp.db
+<!-- DATABASE_URL=sqlite:///./todosapp.db -->
+DATABASE_URL=postgresql+psycopg://<POSTGRES_USER>:<POSTGRES_PASSWORD>@localhost:5432/<POSTGRES_DB>
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 POSTGRES_USER=<your-postgres-admin-user>
 POSTGRES_PASSWORD=<your-postgres-admin-password>
