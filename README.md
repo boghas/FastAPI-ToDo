@@ -121,3 +121,5 @@ class User(Base):
     role = Column(String)
     phone_number = Column(String)
 ```
+
+To downgrade a revision run: `alembic downgrade -1` and modify your models to match the revision changes.
