@@ -81,3 +81,43 @@ To describe a table: `\d <table-name>
 To shut down the container: `docker compose -f postgresql/docker-compose.yaml down`
 
 To shut down the container and remove the volume (the data will be lost): `docker compose -f postgresql/docker-compose.yaml down -v`
+
+## Initializing alembic
+
+To initialize alembic into the project run the following command: `alembic init <your_environment_name>` Example: `alembic init alembic`.
+
+To test that alembic sees the tables run: `alembic revision --autogenerate -m "initial"'
+
+### Running revisions
+
+To run a new revision run: `alembic revision -m "<revision-message>"` and modify the revision code for `upgrade` and `downgrade` in `alembic/versions/<version_id>.py`
+
+To run the upgrade run: `alembic upgrade <revision_id>`. Don't forget to also update your models.
+
+Example:
+
+```alembic/versions/4cce4b8846da_create_phone_number_for_user_column.py
+...
+def upgrade() -> None:
+    """Upgrade schema."""
+    op.add_column('users', sa.Column('phone_number', sa.String(), nullable=True))
+```
+
+```models/user_model.py
+from db.database import Base
+from sqlalchemy import Column, Integer, String, Boolean
+
+
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True)
+    email = Column(String, unique=True)
+    first_name = Column(String)
+    last_name = Column(String)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
+    role = Column(String)
+    phone_number = Column(String)
+```

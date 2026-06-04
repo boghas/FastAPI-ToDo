@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 
@@ -11,10 +11,11 @@ class Settings(BaseSettings):
     # DB settings
     DATABASE_URL: str = Field(..., description="The database url")
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra="ignore"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 settings = Settings()
