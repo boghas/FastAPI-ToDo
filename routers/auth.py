@@ -10,6 +10,8 @@ from services.auth_service import authenticate_user, create_access_token
 from datetime import timedelta
 from core.config import settings
 from dependencies.database import DbSession
+from dependencies.user import user_dependency
+from core import messages
 
 
 router = APIRouter(
@@ -27,6 +29,7 @@ async def create_user(db: DbSession, create_user_request: CreateUserRequest):
         last_name=create_user_request.last_name,
         role=create_user_request.role,
         hashed_password=hash_password(create_user_request.password),
+        phone_number=create_user_request.phone_number,
         is_active=True
     )
 
@@ -35,6 +38,29 @@ async def create_user(db: DbSession, create_user_request: CreateUserRequest):
         db.commit()
     except:
         raise HTTPException(status_code=500, detail="Database error when creating user.")
+
+
+@router.put('/phone_number/{phone_number}', status_code=status.HTTP_204_NO_CONTENT)
+async def change_phone_number(user: user_dependency, db: DbSession, phone_number: str):
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=messages.USER_NOT_AUTHORIZED
+        )
+    
+    user_model = db.query(User).filter(User.id == user.get('user_id')).first()
+
+    user_model.phone_number = phone_number
+
+    try:
+        db.add(user_model)
+        db.commit()
+    except:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=messages.DATABASE_ERROR_CHANGE_PASSWORD
+        )
     
 
 @router.post('/token', response_model=Token)

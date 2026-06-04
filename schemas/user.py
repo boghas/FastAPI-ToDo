@@ -7,6 +7,7 @@ class CreateUserRequest(BaseModel):
     first_name: str = Field(min_length=2, description="The user's first name.")
     last_name: str = Field(min_length=2, description="The user's last name.")
     password: str = Field(min_length=3, description="The user's password.")
+    phone_number: str = Field(min_length=3, description="The user's phone number.")
     role: str
 
 
